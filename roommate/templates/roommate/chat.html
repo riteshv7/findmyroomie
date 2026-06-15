@@ -1,0 +1,98 @@
+{% extends 'roommate/base.html' %}
+
+{% block title %}Messages - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    
+    <!-- Left Pane: Conversation List -->
+    <div class="chat-inbox-pane {% if selected_chat %}hidden-mobile{% endif %}">
+        <div class="inbox-header">
+            <h2>Inbox</h2>
+        </div>
+        
+        <div class="inbox-list">
+            {% for chat in chat_list %}
+            <a href="{% url 'chat_thread' chat.conversation_id %}" class="inbox-item {% if selected_chat.conversation_id == chat.conversation_id %}active{% endif %}">
+                <div class="avatar-circle">
+                    {{ chat.other_user.first_name|slice:":1"|upper }}{{ chat.other_user.last_name|slice:":1"|upper }}
+                </div>
+                <div class="inbox-item-details">
+                    <div class="inbox-item-header">
+                        <strong>{{ chat.other_user.first_name }} {{ chat.other_user.last_name }}</strong>
+                        <span class="chat-time">{{ chat.last_time|date:"P" }}</span>
+                    </div>
+                    <p class="chat-preview-text">{{ chat.last_message|truncatechars:35 }}</p>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-inbox text-center">
+                <span class="inbox-empty-icon">💬</span>
+                <h4>No active chats</h4>
+                <p>Chat threads will open once you tap "Interested" on a flat listing.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Right Pane: Active Chat Thread -->
+    <div class="chat-thread-pane {% if not selected_chat %}hidden-mobile{% endif %}">
+        {% if selected_chat %}
+        <!-- Header -->
+        <div class="thread-header">
+            <a href="{% url 'chat' %}" class="back-to-inbox-btn mobile-only">← Inbox</a>
+            
+            <div class="thread-user-info">
+                <div class="avatar-circle font-small">
+                    {{ selected_chat.other_user.first_name|slice:":1"|upper }}{{ selected_chat.other_user.last_name|slice:":1"|upper }}
+                </div>
+                <div class="thread-user-details">
+                    <h4>{{ selected_chat.other_user.first_name }} {{ selected_chat.other_user.last_name }}</h4>
+                    <span class="text-muted extra-small">{{ selected_chat.other_user.occupation }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message History -->
+        <div class="thread-messages" id="messages-box">
+            {% for msg in messages %}
+            <div class="message-bubble-row {% if msg.sender == user %}msg-sent-row{% else %}msg-received-row{% endif %}">
+                <div class="message-bubble">
+                    <p class="msg-body-text">{{ msg.body }}</p>
+                    <span class="msg-timestamp">{{ msg.created_at|date:"h:i A" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Input Box -->
+        <form method="post" action="{% url 'chat_thread' selected_chat.conversation_id %}" class="thread-input-form" id="chat-input-form">
+            {% csrf_token %}
+            <input type="text" name="body" placeholder="Type a message..." class="chat-input-field" autocomplete="off" required id="chat-text-input">
+            <button type="submit" class="btn btn-primary btn-chat-send">Send</button>
+        </form>
+        {% else %}
+        <!-- Chat Not Selected Fallback -->
+        <div class="chat-thread-placeholder text-center">
+            <span class="placeholder-icon">💬</span>
+            <h3>Select a conversation</h3>
+            <p>Choose a chat from the inbox list on the left to start messaging.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if selected_chat %}
+<script>
+    // Scroll messages to the bottom
+    const box = document.getElementById('messages-box');
+    box.scrollTop = box.scrollHeight;
+    
+    // Auto-focus input
+    document.getElementById('chat-text-input').focus();
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+can u usee the interview me skills?
+7:09 PM
+HYPOTHESIS: You want to build a roommate-finding platform that focuses heavily on matching compatibility (like Tinder for roommates) 
+and filtering by lifestyle preferences, but we haven't decided the exact stack or the initial MVP scope. CONFIDENCE: ~40% — missing: 
+who the specific target audience is (e.g., college students, a specific city), what the primary binding constraint is (time vs budget), 
+and what exactly constitutes the MVP vs future features.
+
+Q: Who is the specific target audience for the initial launch — is this primarily for university students near a specific campus, or for 
+young professionals in a major city? GUESS: University students, because "FindMyRoomie" sounds like a college-focused app, and student housing 
+is typically where the highest turnover and need for roommate matching exists.
+
+
+
+
+idea refine
+7:10 PM
+How Might We build a platform that removes the friction, anxiety, and risk from finding a compatible roommate or renting a spare room?
+
+To refine this from a broad feature list into a sharp, actionable concept, I need to understand the core of what we're actually solving.
+
+Please answer these 4 sharpening questions:
+
+Who is this for, specifically? Are we targeting college students moving to a new campus, young professionals relocating to major tech hubs, or people with existing leases who just need to fill a spare room fast?
+What does success look like for the MVP? Is it getting 50 people to create a profile, matching 10 people successfully, or reducing the time it takes to find a roommate from 3 weeks to 3 days?
+What are our real constraints? Are you building this solo? What's your timeline to launch a V1?
+Why now, and what's broken? People currently use Facebook groups, Craigslist, or Roomies.com. Why are those failing your specific target audience?

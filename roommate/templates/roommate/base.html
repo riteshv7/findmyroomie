@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}FindMyRoomie Bangalore{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Core Style -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- PWA Manifest & Meta -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="{% static 'images/room1.png' %}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <span class="logo-emoji">🏠</span>
+                <span class="logo-text">FindMyRoomie</span>
+            </div>
+            {% if user.is_authenticated %}
+            <div class="header-actions">
+                <a href="{% url 'logout' %}" class="logout-btn" title="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                </a>
+            </div>
+            {% endif %}
+        </header>
+
+        <!-- Message Alerts -->
+        {% if messages %}
+        <div class="message-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <main class="app-main">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Bottom Navigation Bar (Visible on Mobile) -->
+        {% if user.is_authenticated %}
+        <nav class="app-nav">
+            <a href="{% url 'search' %}" class="nav-item {% if request.resolver_match.url_name == 'search' or request.resolver_match.url_name == 'listing_detail' %}active{% endif %}">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Explore</span>
+            </a>
+            <a href="{% url 'interests' %}" class="nav-item {% if request.resolver_match.url_name == 'interests' %}active{% endif %}">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">Interests</span>
+            </a>
+            <a href="{% url 'chat' %}" class="nav-item {% if request.resolver_match.url_name == 'chat' or request.resolver_match.url_name == 'chat_thread' %}active{% endif %}">
+                <span class="nav-icon">💬</span>
+                <span class="nav-label">Chats</span>
+            </a>
+            <a href="{% url 'profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'profile_setup' or request.resolver_match.url_name == 'role_select' %}active{% endif %}">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </a>
+        </nav>
+        {% endif %}
+
+    </div>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('ServiceWorker registered successfully.', reg.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed:', err);
+                });
+            });
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

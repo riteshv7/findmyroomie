@@ -1,0 +1,40 @@
+{% extends 'roommate/base.html' %}
+
+{% block title %}Choose Your Role - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+    <div class="card glass-card text-center select-role-card">
+        <h1 class="page-title">What are you looking for?</h1>
+        <p class="page-subtitle">Select all that apply to you. You can update these roles at any time in your profile.</p>
+
+        <form method="post" action="{% url 'role_select' %}" class="role-form">
+            {% csrf_token %}
+            
+            <div class="role-options">
+                <!-- Seeker Option -->
+                <label class="role-option-card">
+                    <input type="checkbox" name="roles" value="seeker" {% if 'seeker' in roles %}checked{% endif %} class="role-checkbox">
+                    <div class="role-option-content">
+                        <div class="role-icon">🔍</div>
+                        <h3>I need a Room / Roommate</h3>
+                        <p>Browse available flats, look for flatmates matching your lifestyle in Bangalore, and shortlist properties.</p>
+                    </div>
+                </label>
+
+                <!-- Lister Option -->
+                <label class="role-option-card">
+                    <input type="checkbox" name="roles" value="lister" {% if 'lister' in roles %}checked{% endif %} class="role-checkbox">
+                    <div class="role-option-content">
+                        <div class="role-icon">🔑</div>
+                        <h3>I have a Room to fill</h3>
+                        <p>List your room/flat, define your household rules/lifestyle, and find compatible tenants or flatmates.</p>
+                    </div>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-large margin-top-lg">Save & Continue</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

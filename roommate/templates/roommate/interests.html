@@ -1,0 +1,103 @@
+{% extends 'roommate/base.html' %}
+
+{% block title %}My Interests - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="container container-medium">
+    <h1 class="page-title text-center">Interests Dashboard</h1>
+    
+    <!-- Tab Controls -->
+    <div class="form-tabs">
+        <button class="tab-indicator active" onclick="switchInterestTab('sent-interests')" id="indicator-sent-interests">Rooms I've Shortlisted</button>
+        <button class="tab-indicator" onclick="switchInterestTab('received-interests')" id="indicator-received-interests">Listers Interested in Me</button>
+    </div>
+
+    <!-- Sent Interests Tab -->
+    <div class="tab-panel active" id="sent-interests">
+        <h3 class="section-title">❤️ Rooms you liked</h3>
+        {% if outbound %}
+        <div class="interests-list">
+            {% for item in outbound %}
+            <div class="interest-card glass-card">
+                <div class="interest-card-main" onclick="location.href='{% url 'listing_detail' item.listing.id %}'">
+                    <img src="{{ item.listing.photos.0 }}" alt="Room" class="interest-img">
+                    <div class="interest-details">
+                        <h4>{{ item.listing.get_type_display }} in {{ item.listing.area }}</h4>
+                        <p class="rent-text">₹{{ item.listing.rent }}/mo</p>
+                        <p class="posted-by-text">Owner: {{ item.listing.owner.first_name }}</p>
+                    </div>
+                </div>
+                <div class="interest-card-actions">
+                    <span class="status-badge status-{{ item.interest.status }}">{{ item.interest.get_status_display }}</span>
+                    <!-- Chat link -->
+                    <form method="post" action="{% url 'express_interest' item.listing.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline btn-small">💬 Chat</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state text-center glass-card padding-lg">
+            <span class="empty-icon">🔍</span>
+            <h3>No rooms shortlisted yet</h3>
+            <p>Go to the Explore page and tap "Interested" on rooms that match your lifestyle to see them here.</p>
+            <a href="{% url 'search' %}" class="btn btn-primary margin-top-md">Explore Rooms</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Received Interests Tab -->
+    <div class="tab-panel" id="received-interests">
+        <h3 class="section-title">🔑 Room seekers looking to fill your vacancy</h3>
+        {% if inbound %}
+        <div class="interests-list">
+            {% for item in inbound %}
+            <div class="interest-card glass-card">
+                <div class="interest-card-main">
+                    <div class="avatar-circle">
+                        {{ item.user.first_name|slice:":1"|upper }}{{ item.user.last_name|slice:":1"|upper }}
+                    </div>
+                    <div class="interest-details">
+                        <h4>{{ item.user.first_name }} {{ item.user.last_name }}</h4>
+                        <p class="occupation-text">{{ item.user.occupation }} • Age {{ item.user.age }}</p>
+                        <p class="target-room-text">Interested in: {{ item.listing.get_type_display }} (₹{{ item.listing.rent }})</p>
+                    </div>
+                </div>
+                <div class="interest-card-actions">
+                    <span class="status-badge status-{{ item.interest.status }}">{{ item.interest.get_status_display }}</span>
+                    <form method="post" action="{% url 'express_interest' item.listing.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-small">💬 Connect & Chat</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state text-center glass-card padding-lg">
+            <span class="empty-icon">🛌</span>
+            <h3>No applications received</h3>
+            <p>Ensure your listings are published and have realistic lifestyle factors to invite matching roommates.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchInterestTab(tabId) {
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-indicator').forEach(ind => {
+            ind.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('indicator-' + tabId).classList.add('active');
+    }
+</script>
+{% endblock %}

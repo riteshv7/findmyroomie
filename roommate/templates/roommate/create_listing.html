@@ -1,0 +1,195 @@
+{% extends 'roommate/base.html' %}
+
+{% block title %}Create Room Listing - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="container container-medium">
+    <div class="card glass-card profile-card">
+        <h1 class="page-title text-center">Post Your Room / Flat</h1>
+        <p class="page-subtitle text-center">Give accurate details about the room and your household lifestyle to match with the right seeker.</p>
+
+        <!-- Tab Indicators -->
+        <div class="form-tabs">
+            <button class="tab-indicator active" onclick="switchTab('details-tab')" id="indicator-details-tab">1. Room Details</button>
+            <button class="tab-indicator" onclick="switchTab('household-tab')" id="indicator-household-tab">2. Household Reality</button>
+        </div>
+
+        <form method="post" action="{% url 'create_listing' %}" enctype="multipart/form-data" class="create-listing-form">
+            {% csrf_token %}
+
+            <!-- SECTION 1: Room Details -->
+            <div class="tab-panel active" id="details-tab">
+                <h3 class="section-title">🏢 Core Flat Details</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Property Type</label>
+                        {{ form.type }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bangalore Area</label>
+                        {{ form.area }}
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Nearest Metro / Landmark</label>
+                        {{ form.nearest_metro }}
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Monthly Rent (₹)</label>
+                            {{ form.rent }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Security Deposit (₹)</label>
+                            {{ form.deposit }}
+                        </div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">One-Time Setup Cost (₹)</label>
+                            {{ form.setup_cost }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Monthly Utility Bill Est. (₹)</label>
+                            {{ form.monthly_expense_estimate }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Available From</label>
+                        {{ form.available_from }}
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">House Rules (e.g. quiet hours, cooking guidelines)</label>
+                        {{ form.house_rules }}
+                    </div>
+                </div>
+
+                <div class="tab-footer">
+                    <button type="button" class="btn btn-primary" onclick="switchTab('household-tab')">Next: Household Lifestyle →</button>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Household Profile (Lifestyle Reality) -->
+            <div class="tab-panel" id="household-tab">
+                <h3 class="section-title">🍳 Kitchen & Cooking</h3>
+                <div class="form-group">
+                    <label class="form-label">Food cooking allowed/followed in the house</label>
+                    {{ form.food_policy }}
+                </div>
+                <div class="form-group-checkbox">
+                    {{ form.share_kitchen_non_veg }}
+                    <label for="id_share_kitchen_non_veg">Non-veg cooking can share kitchen utensils?</label>
+                </div>
+
+                <h3 class="section-title margin-top-lg">👥 Current Members & Target</h3>
+                <div class="form-group">
+                    <label class="form-label">Household member profile fits best with</label>
+                    {{ form.tenant_type }}
+                </div>
+
+                <h3 class="section-title margin-top-lg">🚬 Smoking & Drinking Rules</h3>
+                <div class="form-grid-2">
+                    <div class="form-group-checkbox">
+                        {{ form.smoking_allowed }}
+                        <label for="id_smoking_allowed">Smoking is allowed in the house/balcony?</label>
+                    </div>
+                    <div class="form-group-checkbox">
+                        {{ form.drinking_allowed }}
+                        <label for="id_drinking_allowed">Drinking is allowed in the house?</label>
+                    </div>
+                </div>
+
+                <h3 class="section-title margin-top-lg">🏡 Policies & Tolerances</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Partner stays over policy</label>
+                        {{ form.partner_stays_over }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Guests policy</label>
+                        {{ form.guests_policy }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Average Noise Level in House (1 = Silent, 5 = Active/Loud)</label>
+                        {{ form.noise_level }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Average Cleanliness Maintenance (1 = Casual, 5 = Spotless)</label>
+                        {{ form.cleanliness_level }}
+                    </div>
+                </div>
+
+                <h3 class="section-title margin-top-lg">🐾 Facilities & Services</h3>
+                <div class="form-group">
+                    <label class="form-label">Cook / Maid availability</label>
+                    {{ form.cook_maid }}
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group-checkbox">
+                        {{ form.pets_allowed }}
+                        <label for="id_pets_allowed">Pets are allowed?</label>
+                    </div>
+                    <div class="form-group-checkbox">
+                        {{ form.parking_available }}
+                        <label for="id_parking_available">Parking spot is available?</label>
+                    </div>
+                </div>
+
+                <div class="form-group margin-top-md">
+                    <label class="form-label">Languages spoken in household</label>
+                    <div class="checkbox-container">
+                        {{ form.languages }}
+                    </div>
+                </div>
+
+                <h3 class="section-title margin-top-lg">📸 Display Image</h3>
+                <div class="form-group">
+                    <label class="form-label">Choose a placeholder photo for your flat listing</label>
+                    <div class="image-radio-group-container margin-bottom-md">
+                        {{ form.photo_choice }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Or upload a custom photo file</label>
+                    {{ form.image }}
+                    {% if form.image.errors %}
+                    <span class="field-error">{{ form.image.errors.as_text }}</span>
+                    {% endif %}
+                </div>
+
+
+                <div class="tab-footer">
+                    <button type="button" class="btn btn-secondary" onclick="switchTab('details-tab')">← Back</button>
+                    <button type="submit" class="btn btn-success btn-large">Publish Listing</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchTab(tabId) {
+        // Hide all panels
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        
+        // Deactivate all indicators
+        document.querySelectorAll('.tab-indicator').forEach(ind => {
+            ind.classList.remove('active');
+        });
+        
+        // Show selected panel
+        document.getElementById(tabId).classList.add('active');
+        
+        // Activate selected indicator
+        document.getElementById('indicator-' + tabId).classList.add('active');
+        
+        // Scroll to top of the card
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+{% endblock %}

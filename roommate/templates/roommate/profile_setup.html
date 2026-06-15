@@ -1,0 +1,217 @@
+{% extends 'roommate/base.html' %}
+
+{% block title %}Seeker Profile Setup - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="container container-medium">
+    <div class="card glass-card profile-card">
+        <h1 class="page-title text-center">Set Up Your Seeker Profile</h1>
+        <p class="page-subtitle text-center">These details represent your lifestyle preferences, which will be matched against flat listings.</p>
+
+        <!-- Tab Indicators -->
+        <div class="form-tabs">
+            <button class="tab-indicator active" onclick="switchTab('basic-tab')" id="indicator-basic-tab">1. Basic Info</button>
+            <button class="tab-indicator" onclick="switchTab('lifestyle-tab')" id="indicator-lifestyle-tab">2. Lifestyle Prefs</button>
+            <button class="tab-indicator" onclick="switchTab('budget-tab')" id="indicator-budget-tab">3. Budget & Area</button>
+        </div>
+
+        <form method="post" action="{% url 'profile_setup' %}" class="profile-setup-form">
+            {% csrf_token %}
+
+            <!-- SECTION 1: Basic Info -->
+            <div class="tab-panel active" id="basic-tab">
+                <h3 class="section-title">👤 Tell us about yourself</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        {{ user_form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        {{ user_form.last_name }}
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Age</label>
+                            {{ user_form.age }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            {{ user_form.gender }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Occupation</label>
+                        {{ user_form.occupation }}
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Languages Spoken</label>
+                        <div class="checkbox-container">
+                            {{ user_form.languages }}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-footer">
+                    <button type="button" class="btn btn-primary" onclick="switchTab('lifestyle-tab')">Next: Lifestyle Prefs →</button>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Lifestyle Preferences -->
+            <div class="tab-panel" id="lifestyle-tab">
+                <h3 class="section-title">🍳 Food & Cooking</h3>
+                <div class="form-group">
+                    <label class="form-label">Food Preference</label>
+                    {{ pref_form.food_preference }}
+                </div>
+                <div class="form-group-checkbox">
+                    {{ pref_form.share_kitchen_non_veg }}
+                    <label for="id_share_kitchen_non_veg">OK sharing kitchen with non-veg cooking?</label>
+                </div>
+
+                <h3 class="section-title margin-top-lg">🚬 Smoking & Drinking</h3>
+                <div class="form-grid-2">
+                    <div class="form-group-checkbox">
+                        {{ pref_form.smoking_ok }}
+                        <label for="id_smoking_ok">OK with smoking roommates?</label>
+                    </div>
+                    <div class="form-group-checkbox">
+                        {{ pref_form.drinking_ok }}
+                        <label for="id_drinking_ok">OK with drinking roommates?</label>
+                    </div>
+                </div>
+
+                <h3 class="section-title margin-top-lg">🏠 Household Rules & Habits</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Partner stays over policy</label>
+                        {{ pref_form.partner_stays_over }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Guests policy</label>
+                        {{ pref_form.guests_policy }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Noise Tolerance (1 = Quiet, 5 = Loud)</label>
+                        {{ pref_form.noise_tolerance }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Minimum Cleanliness Level (1 = Relaxed, 5 = Spotless)</label>
+                        {{ pref_form.cleanliness }}
+                    </div>
+                </div>
+
+                <h3 class="section-title margin-top-lg">🐾 Practical Settings</h3>
+                <div class="form-group">
+                    <label class="form-label">Cook/Maid status preference</label>
+                    {{ pref_form.cook_maid }}
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group-checkbox">
+                        {{ pref_form.pets_ok }}
+                        <label for="id_pets_ok">OK with pets in the house?</label>
+                    </div>
+                    <div class="form-group-checkbox">
+                        {{ pref_form.parking_needed }}
+                        <label for="id_parking_needed">Need parking space?</label>
+                    </div>
+                </div>
+
+                <div class="form-group margin-top-md">
+                    <label class="form-label">Ideal Roommate Languages</label>
+                    <div class="checkbox-container">
+                        {{ pref_form.languages }}
+                    </div>
+                </div>
+
+                <div class="tab-footer">
+                    <button type="button" class="btn btn-secondary" onclick="switchTab('basic-tab')">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="switchTab('budget-tab')">Next: Budget & Area →</button>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Budget & Location -->
+            <div class="tab-panel" id="budget-tab">
+                <h3 class="section-title">💰 Financial Preferences</h3>
+                <div class="form-grid">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Min Monthly Rent (₹)</label>
+                            {{ pref_form.rent_min }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Monthly Rent (₹)</label>
+                            {{ pref_form.rent_max }}
+                        </div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Max Security Deposit (₹)</label>
+                            {{ pref_form.deposit_max }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Setup Cost (₹)</label>
+                            {{ pref_form.setup_cost_max }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Monthly Expense Est. (Utility bills/₹)</label>
+                        {{ pref_form.monthly_expense_max }}
+                    </div>
+                </div>
+
+                <h3 class="section-title margin-top-lg">📍 Bangalore Locations</h3>
+                <div class="form-group">
+                    <label class="form-label">Preferred Neighborhoods</label>
+                    <div class="checkbox-container">
+                        {{ pref_form.preferred_areas }}
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Preferred flat type</label>
+                        <div class="checkbox-container">
+                            {{ pref_form.preferred_types }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Proximity to Work/College (km)</label>
+                        {{ pref_form.distance_max_km }}
+                    </div>
+                </div>
+
+                <div class="tab-footer">
+                    <button type="button" class="btn btn-secondary" onclick="switchTab('lifestyle-tab')">← Back</button>
+                    <button type="submit" class="btn btn-success btn-large">Save Profile & Browse Rooms</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchTab(tabId) {
+        // Hide all panels
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        
+        // Deactivate all indicators
+        document.querySelectorAll('.tab-indicator').forEach(ind => {
+            ind.classList.remove('active');
+        });
+        
+        // Show selected panel
+        document.getElementById(tabId).classList.add('active');
+        
+        // Activate selected indicator
+        document.getElementById('indicator-' + tabId).classList.add('active');
+        
+        // Scroll to top of the card
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+{% endblock %}

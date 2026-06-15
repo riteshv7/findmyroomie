@@ -1,0 +1,227 @@
+{% extends 'roommate/base.html' %}
+
+{% block title %}My Profile - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="container container-medium profile-overview-wrapper">
+    <div class="card glass-card">
+        
+        <!-- Profile Header -->
+        <div class="profile-overview-header text-center padding-lg">
+            <div class="avatar-circle avatar-large margin-auto">
+                {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+            </div>
+            
+            <h1 class="margin-top-md">{{ user.first_name }} {{ user.last_name }}</h1>
+            <p class="text-secondary">{{ user.occupation }} • Age {{ user.age }}</p>
+            <p class="text-muted small">📞 {{ user.phone }} (Verified Account)</p>
+
+            <div class="role-badges margin-top-md">
+                {% for role in user.roles %}
+                <span class="role-badge-pill">{{ role|title }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Seeker Preferences Summary -->
+        {% if 'seeker' in user.roles %}
+        <div class="detail-section">
+            <div class="section-header-row">
+                <h3 class="detail-section-title">⚡ Your Seeker Preferences</h3>
+                <a href="{% url 'profile_setup' %}" class="btn btn-outline btn-small">Edit Preferences</a>
+            </div>
+
+            <div class="lifestyle-info-grid margin-top-md">
+                <div class="info-item">
+                    <span class="info-icon">🍲</span>
+                    <div class="info-details">
+                        <strong>Food Preference</strong>
+                        <span>{{ user.seeker_profile.food_preference|title }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🍳</span>
+                    <div class="info-details">
+                        <strong>Kitchen Sharing</strong>
+                        <span>{% if user.seeker_profile.share_kitchen_non_veg %}OK sharing utensils{% else %}Vegetarian only kitchen{% endif %}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🚬</span>
+                    <div class="info-details">
+                        <strong>Smoking tolerance</strong>
+                        <span>{% if user.seeker_profile.smoking_ok %}OK with smoking flatmates{% else %}Strictly non-smoking flat{% endif %}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🍺</span>
+                    <div class="info-details">
+                        <strong>Drinking tolerance</strong>
+                        <span>{% if user.seeker_profile.drinking_ok %}OK with drinking flatmates{% else %}Prefer non-drinking flat{% endif %}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🤝</span>
+                    <div class="info-details">
+                        <strong>Partner Stay Over</strong>
+                        <span>{{ user.seeker_profile.partner_stays_over|title }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🚪</span>
+                    <div class="info-details">
+                        <strong>Guests Policy</strong>
+                        <span>{{ user.seeker_profile.guests_policy|title }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🔊</span>
+                    <div class="info-details">
+                        <strong>Max Noise Tolerance</strong>
+                        <span>{{ user.seeker_profile.noise_tolerance }} / 5</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🧹</span>
+                    <div class="info-details">
+                        <strong>Min Cleanliness Requirement</strong>
+                        <span>{{ user.seeker_profile.cleanliness }} / 5</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🗣️</span>
+                    <div class="info-details">
+                        <strong>Ideal Languages</strong>
+                        <span>{{ user.seeker_profile.languages|join:", " }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">👩‍🍳</span>
+                    <div class="info-details">
+                        <strong>Cook / Maid Status</strong>
+                        <span>{{ user.seeker_profile.cook_maid|title }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🐾</span>
+                    <div class="info-details">
+                        <strong>OK with pets</strong>
+                        <span>{% if user.seeker_profile.pets_ok %}Yes, pets welcome{% else %}Prefer no pets{% endif %}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🚗</span>
+                    <div class="info-details">
+                        <strong>Parking Needed</strong>
+                        <span>{% if user.seeker_profile.parking_needed %}Yes, parking needed{% else %}No parking needed{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="budget-summary-box margin-top-lg">
+                <h4>💰 Budget & Target Neighborhoods</h4>
+                <p><strong>Rent Budget Range:</strong> ₹{{ user.seeker_profile.rent_min }} - ₹{{ user.seeker_profile.rent_max }}/mo</p>
+                <p><strong>Max security deposit:</strong> ₹{{ user.seeker_profile.deposit_max }}</p>
+                <p><strong>Max setup cost limit:</strong> ₹{{ user.seeker_profile.setup_cost_max }}</p>
+                <p><strong>Preferred Neighborhoods:</strong> {{ user.seeker_profile.preferred_areas|join:", " }}</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="detail-section text-center padding-lg">
+            <h3>No Seeker preferences set up</h3>
+            <p class="text-secondary margin-bottom-md">To match with flat listings, add seeker preferences to your account.</p>
+            <a href="{% url 'profile_setup' %}" class="btn btn-primary">Setup Seeker Preferences</a>
+        </div>
+        {% endif %}
+
+        <hr class="section-divider">
+
+        <!-- Account Options -->
+        <div class="detail-section account-options-section">
+            <h3 class="detail-section-title">⚙️ Account Settings</h3>
+            <div class="account-actions-list">
+                <a href="{% url 'role_select' %}" class="account-action-link">
+                    <span>🔄 Switch or Add User Roles (Seeker / Lister)</span>
+                    <span class="chevron-right">→</span>
+                </a>
+                <a href="{% url 'logout' %}" class="account-action-link text-danger">
+                    <span>🚪 Logout from FindMyRoomie</span>
+                    <span class="chevron-right">→</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .avatar-large {
+        width: 80px;
+        height: 80px;
+        font-size: 28px;
+    }
+    .margin-auto {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .role-badges {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+    .role-badge-pill {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        font-size: 13px;
+        font-weight: 700;
+    }
+    .section-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .budget-summary-box {
+        background-color: #f1f5f9;
+        border-radius: var(--radius-sm);
+        padding: 16px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    .budget-summary-box h4 {
+        margin-bottom: 8px;
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+    .account-actions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .account-action-link {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background-color: #f8fafc;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 14px;
+        transition: var(--transition);
+    }
+    .account-action-link:hover {
+        background-color: #f1f5f9;
+    }
+    .account-action-link.text-danger {
+        color: var(--danger-color);
+    }
+    .chevron-right {
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}

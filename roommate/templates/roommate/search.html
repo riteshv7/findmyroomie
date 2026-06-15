@@ -1,0 +1,201 @@
+{% extends 'roommate/base.html' %}
+{% load static %}
+
+{% block title %}Explore Rooms & Roommates - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="explore-container">
+    
+    <!-- Top Search & Sort Panel -->
+    <div class="search-sort-panel glass-card">
+        <form method="get" action="{% url 'search' %}" class="filter-form" id="search-form">
+            
+            <div class="search-row">
+                <div class="form-group search-input-group">
+                    <span class="input-icon">📍</span>
+                    <select name="area" class="form-select-search" onchange="this.form.submit()">
+                        {% for area_opt in areas %}
+                        <option value="{{ area_opt }}" {% if selected_area == area_opt %}selected{% endif %}>{{ area_opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="button" class="btn btn-secondary filter-toggle-btn" onclick="toggleFilters()">
+                    <span>⚙️ Filters</span>
+                </button>
+            </div>
+
+            <!-- Distance calculation row -->
+            <div class="distance-calculator-row">
+                <div class="form-group distance-input-group">
+                    <span class="input-icon">🏢</span>
+                    <input type="text" name="work_location" placeholder="Enter work/study location (e.g. Bellandur)" value="{{ work_location }}" class="form-input-search">
+                </div>
+                <button type="submit" class="btn btn-primary btn-search-go">Go</button>
+            </div>
+
+            <!-- Expandable Filters Section -->
+            <div class="expandable-filters-panel" id="filters-panel">
+                <div class="filters-grid">
+                    
+                    <div class="form-group">
+                        <label class="filter-label">Max Rent (₹)</label>
+                        <input type="number" name="max_rent" placeholder="Any Budget" value="{{ max_rent }}" class="form-input-filter">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="filter-label">Food Policy</label>
+                        <select name="food_policy" class="form-select-filter">
+                            <option value="any" {% if food_policy == 'any' %}selected{% endif %}>Any Food Policy</option>
+                            <option value="veg" {% if food_policy == 'veg' %}selected{% endif %}>Veg only</option>
+                            <option value="non-veg" {% if food_policy == 'non-veg' %}selected{% endif %}>Non-veg</option>
+                            <option value="eggetarian" {% if food_policy == 'eggetarian' %}selected{% endif %}>Eggetarian</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="filter-label">Smoking Rule</label>
+                        <select name="smoking_allowed" class="form-select-filter">
+                            <option value="any" {% if smoking_allowed == 'any' %}selected{% endif %}>Any Smoking Rule</option>
+                            <option value="no" {% if smoking_allowed == 'no' %}selected{% endif %}>No Smoking allowed</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="filter-label">Drinking Rule</label>
+                        <select name="drinking_allowed" class="form-select-filter">
+                            <option value="any" {% if drinking_allowed == 'any' %}selected{% endif %}>Any Drinking Rule</option>
+                            <option value="no" {% if drinking_allowed == 'no' %}selected{% endif %}>No Drinking allowed</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="filter-label">Pets Allowed</label>
+                        <select name="pets_allowed" class="form-select-filter">
+                            <option value="any" {% if pets_allowed == 'any' %}selected{% endif %}>Any Pet Policy</option>
+                            <option value="yes" {% if pets_allowed == 'yes' %}selected{% endif %}>Yes, pets allowed</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="filter-label">Parking Available</label>
+                        <select name="parking_available" class="form-select-filter">
+                            <option value="any" {% if parking_available == 'any' %}selected{% endif %}>Any Parking Policy</option>
+                            <option value="yes" {% if parking_available == 'yes' %}selected{% endif %}>Yes, parking spot</option>
+                        </select>
+                    </div>
+
+                </div>
+                
+                <div class="filters-footer">
+                    <a href="{% url 'search' %}" class="btn btn-link">Clear All</a>
+                    <button type="submit" class="btn btn-success">Apply Filters</button>
+                </div>
+            </div>
+
+            <!-- Sorting Tabs -->
+            <div class="sorting-row">
+                <span class="sort-label">Sort by:</span>
+                <div class="sort-tabs">
+                    <button type="submit" name="sort_by" value="newest" class="sort-tab {% if sort_by == 'newest' %}active{% endif %}">Newest</button>
+                    <button type="submit" name="sort_by" value="lowest_rent" class="sort-tab {% if sort_by == 'lowest_rent' %}active{% endif %}">Lowest Rent</button>
+                    {% if work_location %}
+                    <button type="submit" name="sort_by" value="nearest" class="sort-tab {% if sort_by == 'nearest' %}active{% endif %}">Nearest Proximity</button>
+                    {% endif %}
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Listings Grid -->
+    <div class="listings-section">
+        <div class="listings-header-row">
+            <h2>Available Rooms ({{ listings|length }})</h2>
+            {% if 'lister' in user.roles or not user.roles %}
+            <a href="{% url 'create_listing' %}" class="btn btn-outline btn-small">+ Post a Room</a>
+            {% endif %}
+        </div>
+
+        {% if listings %}
+        <div class="listings-grid">
+            {% for listing in listings %}
+            <div class="listing-card glass-card clickable" onclick="location.href='{% url 'listing_detail' listing.id %}'">
+                
+                <!-- Listing Image & Match Badge -->
+                <div class="card-image-wrapper">
+                    {% if listing.photos %}
+                    <img src="{{ listing.photos.0 }}" alt="Room Image" class="card-img" onerror="this.src='{% static 'images/room1.png' %}'">
+                    {% else %}
+                    <img src="{% static 'images/room1.png' %}" alt="Room Image" class="card-img">
+                    {% endif %}
+                    
+                    <!-- Match Compatibility Badge -->
+                    <div class="match-badge {% if listing.match_pct >= 85 %}match-high{% elif listing.match_pct >= 65 %}match-med{% else %}match-low{% endif %}">
+                        ⚡ {{ listing.match_pct }}% Match
+                    </div>
+                </div>
+
+                <!-- Card Content -->
+                <div class="card-content">
+                    <div class="card-price-row">
+                        <span class="card-rent">₹{{ listing.rent }}<span class="rent-period">/mo</span></span>
+                        <span class="card-type-badge">{{ listing.get_type_display }}</span>
+                    </div>
+
+                    <h3 class="card-location">📍 {{ listing.area }}</h3>
+                    
+                    {% if listing.nearest_metro %}
+                    <p class="card-metro-text">🚇 {{ listing.nearest_metro }}</p>
+                    {% endif %}
+
+                    {% if listing.distance is not None %}
+                    <div class="card-distance-badge">
+                        🏢 {{ listing.distance }} km from {{ work_location }}
+                    </div>
+                    {% endif %}
+
+                    <hr class="card-divider">
+
+                    <!-- Lifestyle Tags -->
+                    <div class="card-lifestyle-summary">
+                        <span class="lifestyle-mini-tag food-tag">🍲 {{ listing.household_profile.food_policy|title }}</span>
+                        <span class="lifestyle-mini-tag tenant-tag">👥 {{ listing.household_profile.tenant_type|title }}</span>
+                        {% if listing.household_profile.smoking_allowed %}
+                        <span class="lifestyle-mini-tag smoking-tag allowed">🚬 Smoking OK</span>
+                        {% else %}
+                        <span class="lifestyle-mini-tag smoking-tag forbidden">🚬 No Smoking</span>
+                        {% endif %}
+                        <span class="lifestyle-mini-tag clean-tag">🧹 Clean: {{ listing.household_profile.cleanliness_level }}/5</span>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="posted-date">Posted {{ listing.created_at|timesince }} ago</span>
+                        <span class="view-btn">View Details →</span>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state text-center glass-card padding-xl">
+            <span class="empty-icon">😢</span>
+            <h3>No room listings found</h3>
+            <p>Try resetting your filter criteria or changing the area selection to search wider.</p>
+            <a href="{% url 'search' %}" class="btn btn-primary margin-top-md">Reset Search</a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleFilters() {
+        const panel = document.getElementById('filters-panel');
+        panel.classList.toggle('active');
+    }
+</script>
+{% endblock %}

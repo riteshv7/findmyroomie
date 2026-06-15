@@ -1,0 +1,59 @@
+{% extends 'roommate/base.html' %}
+
+{% block title %}Login / Signup - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-card glass-card">
+        <div class="login-header text-center">
+            <h1 class="auth-title">Find Your Perfect Roomie</h1>
+            <p class="auth-subtitle">Bangalore's lifestyle-focused roommate finder</p>
+        </div>
+
+        {% if not otp_sent %}
+        <!-- Step 1: Phone input -->
+        <form method="post" action="{% url 'login' %}" class="auth-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_phone" class="form-label">Phone Number</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                <span class="field-error">{{ form.phone.errors.as_text }}</span>
+                {% endif %}
+                <p class="form-help">We'll verify you via a simulated 6-digit SMS OTP.</p>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Send Verification Code</button>
+        </form>
+        {% else %}
+        <!-- Step 2: OTP verification -->
+        <div class="simulated-sms-banner">
+            <span class="sms-icon">💬</span>
+            <div class="sms-content">
+                <strong>Simulated SMS (Bangalore Local Host)</strong>
+                <p>Your FindMyRoomie verification code is <strong class="otp-highlight">123456</strong>.</p>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'login' %}" class="auth-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_otp" class="form-label">Enter 6-Digit OTP</label>
+                {{ form.otp }}
+                {% if form.otp.errors %}
+                <span class="field-error">{{ form.otp.errors.as_text }}</span>
+                {% endif %}
+                <p class="form-help">Enter the code displayed in the message box above to continue.</p>
+            </div>
+            
+            <button type="submit" class="btn btn-success btn-block">Verify & Continue</button>
+            <a href="{% url 'login' %}" class="btn btn-link btn-block">Change Phone Number</a>
+        </form>
+        {% endif %}
+
+        <div class="auth-footer text-center">
+            <p class="text-muted small">By continuing, you agree to FindMyRoomie's trust guidelines for roommates in Bangalore.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

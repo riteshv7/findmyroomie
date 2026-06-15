@@ -1,0 +1,224 @@
+{% extends 'roommate/base.html' %}
+{% load static %}
+
+{% block title %}{{ listing.get_type_display }} in {{ listing.area }} - FindMyRoomie{% endblock %}
+
+{% block content %}
+<div class="container container-medium listing-detail-wrapper">
+    
+    <!-- Navigation row -->
+    <div class="back-navigation">
+        <a href="{% url 'search' %}" class="back-link">← Back to Explore</a>
+    </div>
+
+    <!-- Main Detail Card -->
+    <div class="card glass-card detail-card">
+        
+        <!-- Large Image Gallery -->
+        <div class="detail-gallery">
+            {% if listing.photos %}
+            <img src="{{ listing.photos.0 }}" alt="Flat image" class="detail-hero-img" onerror="this.src='{% static 'images/room1.png' %}'">
+            {% else %}
+            <img src="{% static 'images/room1.png' %}" alt="Flat image" class="detail-hero-img">
+            {% endif %}
+            
+            <div class="detail-match-badge {% if match_pct >= 85 %}match-high{% elif match_pct >= 65 %}match-med{% else %}match-low{% endif %}">
+                ⚡ {{ match_pct }}% Compatibility Match
+            </div>
+        </div>
+
+        <!-- Core Pricing & Location Header -->
+        <div class="detail-header">
+            <div class="detail-title-row">
+                <span class="detail-type">{{ listing.get_type_display }}</span>
+                <span class="detail-status-badge">{{ listing.get_status_display }}</span>
+            </div>
+            
+            <h1 class="detail-location">📍 {{ listing.area }}</h1>
+            
+            {% if listing.nearest_metro %}
+            <p class="detail-metro">🚇 Nearest Metro: {{ listing.nearest_metro }}</p>
+            {% endif %}
+
+            <div class="price-cards-grid">
+                <div class="price-mini-card">
+                    <span class="price-label">Monthly Rent</span>
+                    <span class="price-val">₹{{ listing.rent }}</span>
+                    <span class="price-period">per month</span>
+                </div>
+                <div class="price-mini-card">
+                    <span class="price-label">Security Deposit</span>
+                    <span class="price-val">₹{{ listing.deposit }}</span>
+                    <span class="price-period">refundable</span>
+                </div>
+                <div class="price-mini-card">
+                    <span class="price-label">Setup Cost</span>
+                    <span class="price-val">₹{{ listing.setup_cost }}</span>
+                    <span class="price-period">one-time cost</span>
+                </div>
+                <div class="price-mini-card">
+                    <span class="price-label">Est. Utilities</span>
+                    <span class="price-val">₹{{ listing.monthly_expense_estimate }}</span>
+                    <span class="price-period">bills split</span>
+                </div>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Match Breakdown Section -->
+        <div class="detail-section">
+            <h3 class="detail-section-title">⚡ How do you match?</h3>
+            <p class="text-muted small margin-bottom-md">Based on your Seeker preferences and their household reality:</p>
+            
+            <div class="match-bullets-list">
+                {% for bullet, type in bullets %}
+                <div class="match-bullet match-bullet-{{ type }}">
+                    <span class="bullet-icon">
+                        {% if type == 'success' %}✓{% elif type == 'warning' %}⚠️{% else %}i{% endif %}
+                    </span>
+                    <span class="bullet-text">{{ bullet }}</span>
+                </div>
+                {% empty %}
+                <div class="text-muted small">Complete your Seeker preferences on your Profile to see match analytics here!</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Household Reality Profiles -->
+        <div class="detail-section">
+            <h3 class="detail-section-title">🏡 Household Lifestyle Reality</h3>
+            
+            <div class="lifestyle-info-grid">
+                <div class="info-item">
+                    <span class="info-icon">🍲</span>
+                    <div class="info-details">
+                        <strong>Food Policy</strong>
+                        <span>{{ listing.household_profile.food_policy|title }} cooking</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🍳</span>
+                    <div class="info-details">
+                        <strong>Kitchen Sharing</strong>
+                        <span>{% if listing.household_profile.share_kitchen_non_veg %}OK sharing utensils{% else %}Vegetarian utensils only{% endif %}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">👥</span>
+                    <div class="info-details">
+                        <strong>Lister Type</strong>
+                        <span>{{ listing.household_profile.tenant_type|title }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🚬</span>
+                    <div class="info-details">
+                        <strong>Smoking Policy</strong>
+                        <span>{% if listing.household_profile.smoking_allowed %}Allowed in house/balcony{% else %}Strictly prohibited{% endif %}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🍺</span>
+                    <div class="info-details">
+                        <strong>Drinking Policy</strong>
+                        <span>{% if listing.household_profile.drinking_allowed %}Allowed{% else %}No drinking in house{% endif %}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🤝</span>
+                    <div class="info-details">
+                        <strong>Partner Stay Over</strong>
+                        <span>{{ listing.household_profile.partner_stays_over|title }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🚪</span>
+                    <div class="info-details">
+                        <strong>Guests Policy</strong>
+                        <span>{{ listing.household_profile.guests_policy|title }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🔊</span>
+                    <div class="info-details">
+                        <strong>Noise Level</strong>
+                        <span>{{ listing.household_profile.noise_level }} / 5</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🧹</span>
+                    <div class="info-details">
+                        <strong>Cleanliness Maintain</strong>
+                        <span>{{ listing.household_profile.cleanliness_level }} / 5</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🗣️</span>
+                    <div class="info-details">
+                        <strong>Languages spoken</strong>
+                        <span>{{ listing.household_profile.languages|join:", " }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">👩‍🍳</span>
+                    <div class="info-details">
+                        <strong>Cook / Maid</strong>
+                        <span>{{ listing.household_profile.cook_maid|title }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🐾</span>
+                    <div class="info-details">
+                        <strong>Pets Allowed</strong>
+                        <span>{% if listing.household_profile.pets_allowed %}Yes, pets welcome{% else %}No pets{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- House Rules -->
+        {% if listing.house_rules %}
+        <div class="detail-section">
+            <h3 class="detail-section-title">📜 House Rules</h3>
+            <p class="rules-text-box">{{ listing.house_rules }}</p>
+        </div>
+        <hr class="section-divider">
+        {% endif %}
+
+        <!-- Lister / Owner Profile -->
+        <div class="detail-section lister-profile-section">
+            <h3 class="detail-section-title">👤 Posted By</h3>
+            <div class="lister-profile-badge">
+                <div class="avatar-circle">
+                    {{ listing.owner.first_name|slice:":1"|upper }}{{ listing.owner.last_name|slice:":1"|upper }}
+                </div>
+                <div class="lister-badge-details">
+                    <h4>{{ listing.owner.first_name }} {{ listing.owner.last_name }}</h4>
+                    <p class="text-muted small">{{ listing.owner.occupation }} • Age {{ listing.owner.age }}</p>
+                    <p class="verification-status small text-success">✓ Verified Phone Account</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Float Call-to-Action Bar -->
+        <div class="detail-cta-bar">
+            {% if listing.owner == user %}
+            <button class="btn btn-secondary btn-block" disabled>This is your listing</button>
+            {% elif interest_exists %}
+            <a href="{% url 'chat' %}" class="btn btn-success btn-block">💬 Open Chat Conversation</a>
+            {% else %}
+            <form method="post" action="{% url 'express_interest' listing.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-block btn-large">❤️ Interested / Open Chat</button>
+            </form>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
